@@ -1,17 +1,28 @@
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
 import csv
 import time
- 
+
+
+def find(driver):
+    element = driver.find_element_by_xpath("//ul[@class='article-list thumbnails']")
+    if element:
+        return element
+    else:
+        return False
+
 def getArticles(FILE_NAME, browser, cid):
 
 		#click get more button to get more article
-		for x in range(0,1):
+		for x in range(0,8):
 			print('load more: ' + str(x))
 			browser.find_element_by_css_selector('button.ladda-button').click()
-			browser.implicitly_wait(2)
+			browser.implicitly_wait(3)
+		browser.implicitly_wait(10)
+		#ul = browser.find_element_by_xpath("//ul[@class='article-list thumbnails']")
+		ul = WebDriverWait(browser, 10).until(find)
 
-		ul = browser.find_element_by_xpath("//ul[@class='article-list thumbnails']")
 		authorId = 0
 		imgSrc = ''
 
@@ -20,6 +31,7 @@ def getArticles(FILE_NAME, browser, cid):
 				#
 				imgSrc = li.find_element_by_class_name('wrap-img').find_element_by_tag_name('img').get_attribute('src')
 				authorName = li.find_element_by_tag_name('p').find_element_by_tag_name('a').text
+				#
 				authorUrl = li.find_element_by_tag_name('p').find_element_by_tag_name('a').get_attribute('href')
 				articleCreatedTime = li.find_element_by_tag_name('p').find_element_by_tag_name('span').get_attribute('data-shared-at')
 				articleTitle = li.find_element_by_tag_name('h4').text
@@ -109,7 +121,7 @@ if __name__ == "__main__":
 			# use send keys or could not find button
 			li = ul.find_elements_by_tag_name('li')[liId].find_element_by_class_name('category').send_keys('\n')
 			print('clicked')
-			browser.implicitly_wait(5)
+			browser.implicitly_wait(10)
 			getArticles(FILE_NAME, browser, liId)
 			liId += 1
 
